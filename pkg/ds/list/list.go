@@ -1,6 +1,7 @@
 package list
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -30,6 +31,34 @@ func (l *List[T]) Push(val T) {
 		node = node.Next()
 	}
 	node.next = newNode[T](node, val)
+}
+
+func (l *List[T]) Set(index int, val T) error {
+	if index >= l.Size() {
+		return errors.New("index out of range")
+	}
+
+	node := l.head
+	for i := 0; i <= index; i++ {
+		node = node.next
+	}
+
+	node.Set(val)
+
+	return nil
+}
+
+func (l *List[T]) Get(index int) (T, error) {
+	if index >= l.Size() {
+		var noop T
+		return noop, errors.New("index out of range")
+	}
+	node := l.head
+	for i := 0; i <= index; i++ {
+		node = node.next
+	}
+
+	return node.val, nil
 }
 
 // Unshift adds an item to the front of the list
@@ -137,6 +166,19 @@ func (l *List[T]) HeadNode() *Node[T] {
 	return l.head
 }
 
+func (l *List[T]) TailNode() *Node[T] {
+	if l.head == nil {
+		return nil
+	}
+
+	curr := l.head
+	for curr.Next() != nil {
+		curr = curr.Next()
+	}
+
+	return curr
+}
+
 func (l List[T]) String() string {
 	builder := strings.Builder{}
 	builder.WriteString("[")
@@ -172,4 +214,8 @@ func (n *Node[T]) Prev() *Node[T] {
 
 func (n *Node[T]) Value() T {
 	return n.val
+}
+
+func (n *Node[T]) Set(val T) {
+	n.val = val
 }
